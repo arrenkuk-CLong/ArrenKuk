@@ -1,4 +1,5 @@
-#Codedex final project: 2048 - Logic
+#Codedex Course final project Dec 2025: 2048 - Logic
+#Last edited 09/08
 import pygame #Game Cg
 import random #Random # placement
 import math #Math of 2048
@@ -58,7 +59,7 @@ class Tile:
                     (self.x + (GRID_WIDTH / 2 - text.get_width() / 2), 
                      self.y + (GRID_HEIGHT / 2 - text.get_height() / 2),
                      ),
-                     ) #Set location of text
+                     ) #Could've tried self.rect.center instead
 
     def set_pos(self, ceil=False):
         if ceil: #round up
@@ -74,17 +75,19 @@ class Tile:
 
 #Intitate game & drawing the grid------------------------------------------------------------------------------
 
-def grid(screen): #Drawing everything on the screen
+def grid(screen): 
     #Rows
-    for row in range(1, Rows): #1 bcz we don't need to draw the top line
+    for row in range(1, Rows): 
         y = row * GRID_HEIGHT
-        pygame.draw.line(screen, Board_Color, (0, y), (WIDTH, y), Thickness) #Line always starts at 0 (x) and Width (x)
+        pygame.draw.line(screen, Board_Color, (0, y), (WIDTH, y), Thickness) 
+        #Line always starts at 0 (x) and Width (x)
     #Columns
-    for col in range(1, Cols): #1 bcz we don't need to draw the top line
+    for col in range(1, Cols):
         x = col * GRID_WIDTH
         pygame.draw.line(screen, Board_Color, (x, 0), (x, HEIGHT), Thickness)
 
-    pygame.draw.rect(screen, Board_Color, (0, 0, WIDTH, HEIGHT), Thickness) #rectangle, setting border thickness, dimensions, and position on pygame
+    pygame.draw.rect(screen, Board_Color, (0, 0, WIDTH, HEIGHT), Thickness) 
+    #rectangle, setting border thickness, dimensions, and position on pygame
 
 def draw(screen, tiles): #Function draws everything on pygame
     screen.fill(Background_Color) #Background
@@ -104,26 +107,27 @@ def get_random_pos(tiles):
     while True: 
         row = random.randrange(0, Rows) #generates up to 3
         col = random.randrange(0, Cols)
-        
-        if f"{row}{col}" not in tiles: #detects whether or not a tile already exists in where this function is generating
+
+        #detects whether or not a tile already exists in where this function is generating
+        if f"{row}{col}" not in tiles: 
             break
 
     return row, col
 
 #Merging/control
-#things to consider: Merging order and many differen scenarios
+#things to consider: Merging order and many different scenarios
 def move_tiles(screen, tiles, clock, direction):
     updated = True
     blocks = set()
 
     if direction == 'left':
-        sort_func = lambda x: x.col #parameter and return col in same line
+        sort_func = lambda x: x.col                                                   #parameter and return col in same line
         reverse = False
         delta = (-Move, 0)
         boundary_check = lambda tile: tile.col == 0
         get_next_tile = lambda tile: tiles.get(f"{tile.row}{tile.col - 1}")
-        merge_check = lambda tile, next_tile: tile.x > next_tile.x + Move #Only merge when the tile (being moved, has merged far enough into the other tile
-        move_check = lambda tile, next_tile: tile.x > next_tile.x + GRID_WIDTH + Move
+        merge_check = lambda tile, next_tile: tile.x > next_tile.x + Move             #Only merge when the tile has merged
+        move_check = lambda tile, next_tile: tile.x > next_tile.x + GRID_WIDTH + Move #far enough into the other tile
         ceil = True
 
     elif direction == 'right':
@@ -132,8 +136,8 @@ def move_tiles(screen, tiles, clock, direction):
         delta = (Move, 0) #Positive cuz right direction
         boundary_check = lambda tile: tile.col == Cols - 1
         get_next_tile = lambda tile: tiles.get(f"{tile.row}{tile.col + 1}") #reverse
-        merge_check = lambda tile, next_tile: tile.x > next_tile.x + Move 
-        move_check = lambda tile, next_tile: tile.x + GRID_WIDTH + Move < next_tile.x + GRID_WIDTH + Move
+        merge_check = lambda tile, next_tile: tile.x + GRID_WIDTH + Move < next_tile.x   #Fixed K_RIGHT from eating all Tiles
+        move_check = lambda tile, next_tile: tile.x + GRID_WIDTH + Move < next_tile.x    #to the right of the left-most column of tiles
         ceil = False #round down for right side
 
 
@@ -166,11 +170,11 @@ def move_tiles(screen, tiles, clock, direction):
         for i, tile in enumerate(sorted_tiles): #Get index and tile object
             if boundary_check(tile): 
                 continue
-
-            next_tile = get_next_tile(tile) #getting the next tile
+            #Get next tile
+            next_tile = get_next_tile(tile) 
             if not next_tile:
                 tile.move(delta)
-            #if we do have a next tile: Then we do the merge operation below
+            #if we do have a next tile: Then merge operation is done
             elif tile.value == next_tile.value and tile not in blocks and next_tile not in blocks:
                 if merge_check(tile, next_tile): #checks if we are merging
                     tile.move(delta) #continues if yes
